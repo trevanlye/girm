@@ -1,9 +1,10 @@
 package girm
 
 import (
+	"strconv"
+
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
-	"strconv"
 )
 
 type DB[T any] struct {
@@ -25,10 +26,10 @@ func (d *DB[T]) Insert(c *gin.Context) {
 func (d *DB[T]) SelectAll(c *gin.Context) {
 	var es []*T
 	if err := d.db.Find(&es).Error; err != nil {
-		jsonFail(c, err.Error())
+		JsonFail(c, err.Error())
 		return
 	}
-	jsonOK(c, es)
+	JsonOK(c, es)
 }
 
 func (d *DB[T]) SelectByPage(c *gin.Context, where func(db *gorm.DB) *gorm.DB) {
@@ -44,9 +45,9 @@ func (d *DB[T]) SelectByPage(c *gin.Context, where func(db *gorm.DB) *gorm.DB) {
 
 	defer func() {
 		if err != nil {
-			jsonFail(c, err.Error())
+			JsonFail(c, err.Error())
 		} else {
-			jsonOK(c, &page)
+			JsonOK(c, &page)
 		}
 	}()
 
@@ -86,18 +87,18 @@ func (d *DB[T]) Save(c *gin.Context) {
 func (d *DB[T]) Delete(c *gin.Context) {
 	var ids []int
 	if err := c.ShouldBindJSON(&ids); err != nil {
-		jsonFail(c, err.Error())
+		JsonFail(c, err.Error())
 		return
 	}
 
 	var es []*T
 	if err := d.db.Where("id IN ?", ids).Find(&es).Error; err != nil {
-		jsonFail(c, err.Error())
+		JsonFail(c, err.Error())
 		return
 	}
 	if err := d.db.Delete(&es).Error; err != nil {
-		jsonFail(c, err.Error())
+		JsonFail(c, err.Error())
 		return
 	}
-	jsonOK(c, nil)
+	JsonOK(c, nil)
 }

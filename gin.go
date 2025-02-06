@@ -2,9 +2,10 @@ package girm
 
 import (
 	"bytes"
-	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 // Compatible with single object or multiple objects
@@ -13,9 +14,9 @@ func operation[T any](c *gin.Context, opr func(...*T) error) {
 	var rsp any
 	defer func() {
 		if err != nil {
-			jsonFail(c, err.Error())
+			JsonFail(c, err.Error())
 		} else {
-			jsonOK(c, rsp)
+			JsonOK(c, rsp)
 		}
 	}()
 	jsonData, err := io.ReadAll(c.Request.Body)
@@ -46,14 +47,18 @@ func operation[T any](c *gin.Context, opr func(...*T) error) {
 	}
 }
 
-func jsonOK(c *gin.Context, obj any) {
+func IndexHandler(c *gin.Context)  {
+	c.HTML(http.StatusOK, "index.html", nil)
+}
+
+func JsonOK(c *gin.Context, obj any) {
 	c.JSON(http.StatusOK, gin.H{
 		"code": 200,
 		"data": obj,
 	})
 }
 
-func jsonFail(c *gin.Context, obj any) {
+func JsonFail(c *gin.Context, obj any) {
 	c.JSON(http.StatusOK, gin.H{
 		"code":    500,
 		"message": obj,
