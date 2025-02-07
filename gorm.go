@@ -5,7 +5,7 @@ import (
 
 	"github.com/samber/lo"
 	"gorm.io/driver/mysql"
-	"gorm.io/driver/sqlite"
+	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 )
 
