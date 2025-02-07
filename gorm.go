@@ -1,7 +1,11 @@
 package girm
 
 import (
+	"fmt"
+
 	"github.com/samber/lo"
+	"gorm.io/driver/mysql"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
@@ -21,4 +25,21 @@ func bulkOperate[T any](es []*T, f func(any) *gorm.DB) error {
 		}
 	}
 	return nil
+}
+
+func NewSqlite(dbName string) (*gorm.DB, error) {
+	db, err := gorm.Open(sqlite.Open(dbName), &gorm.Config{})
+	if err != nil {
+		return nil, err
+	}
+	return db, nil
+}
+
+func NewMySQL(ipaddr, dbName, userName, password string) (*gorm.DB, error) {
+	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", userName, password, ipaddr, dbName)
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	if err != nil {
+		return nil, err
+	}
+	return db, nil
 }
