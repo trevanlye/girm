@@ -1,10 +1,15 @@
 package girm
 
 import (
+	"errors"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+)
+
+const (
+	invalidIdMsg = "invalid id"
 )
 
 type DB[T any] struct {
@@ -30,6 +35,25 @@ func (d *DB[T]) SelectAll(c *gin.Context) {
 		return
 	}
 	JsonOK(c, es)
+}
+
+func (d *DB[T]) SelectById(c *gin.Context) {
+	var err error
+	var e *T
+	defer func ()  {
+		if err != nil {
+			JsonFail(c, err.Error())
+		} else {
+			JsonOK(c, e)
+		}
+	}()
+
+	id, ok := c.Params.Get("id")
+	if !ok {
+		err = errors.New(invalidIdMsg)
+		return
+	}
+	err = d.db.First(e, "id = ?", id).Error
 }
 
 func (d *DB[T]) SelectByPage(c *gin.Context, where func(db *gorm.DB) *gorm.DB) {
