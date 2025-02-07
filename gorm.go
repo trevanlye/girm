@@ -43,3 +43,4 @@ func NewMySQL(ipaddr, dbName, userName, password string) (*gorm.DB, error) {
 	}
 	return db, nil
 }
+
