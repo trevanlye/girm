@@ -40,7 +40,7 @@ func (d *DB[T]) SelectAll(c *gin.Context) {
 func (d *DB[T]) SelectById(c *gin.Context) {
 	var err error
 	var e *T
-	defer func ()  {
+	defer func() {
 		if err != nil {
 			JsonFail(c, err.Error())
 		} else {
@@ -54,6 +54,26 @@ func (d *DB[T]) SelectById(c *gin.Context) {
 		return
 	}
 	err = d.db.First(e, "id = ?", id).Error
+}
+
+//conditionFields: key:field in query;value:field in db. like key=="nodeName" value=="node_name"
+func (d *DB[T]) SelectByConditions(c *gin.Context, conditionFields map[string]string) {
+	var err error
+	var es []*T
+	defer func() {
+		if err != nil {
+			JsonFail(c, err.Error())
+		} else {
+			JsonOK(c, es)
+		}
+	}()
+
+	conditions := make(map[string]any)
+	for queryField, dbField := range conditionFields {
+		queryValue := c.Query(queryField)
+		conditions[dbField] = queryValue
+	}
+	err = d.db.Where(conditions).Find(es).Error
 }
 
 func (d *DB[T]) SelectByPage(c *gin.Context, where func(db *gorm.DB) *gorm.DB) {
