@@ -57,7 +57,7 @@ func (d *DB[T]) SelectById(c *gin.Context) {
 }
 
 //conditionFields: key:field in query;value:field in db. like key=="nodeName" value=="node_name"
-func (d *DB[T]) SelectByConditions(c *gin.Context, conditionFields map[string]string) {
+func (d *DB[T]) SelectByConditions(c *gin.Context, conditionFields map[string]string, preloads ...string) {
 	var err error
 	var es []*T
 	defer func() {
@@ -73,6 +73,11 @@ func (d *DB[T]) SelectByConditions(c *gin.Context, conditionFields map[string]st
 		queryValue := c.Query(queryField)
 		conditions[dbField] = queryValue
 	}
+	d.db = d.db.Where(conditions)
+	for _, pld := range preloads {
+		d.db = d.db.Preload(pld)
+	}
+
 	err = d.db.Where(conditions).Find(&es).Error
 }
 
