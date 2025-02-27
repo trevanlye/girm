@@ -53,7 +53,7 @@ func (d *DB[T]) SelectById(c *gin.Context) {
 		err = errors.New(invalidIdMsg)
 		return
 	}
-	err = d.db.First(e, "id = ?", id).Error
+	err = d.db.First(&e, "id = ?", id).Error
 }
 
 //conditionFields: key:field in query;value:field in db. like key=="nodeName" value=="node_name"
@@ -73,7 +73,7 @@ func (d *DB[T]) SelectByConditions(c *gin.Context, conditionFields map[string]st
 		queryValue := c.Query(queryField)
 		conditions[dbField] = queryValue
 	}
-	err = d.db.Where(conditions).Find(es).Error
+	err = d.db.Where(conditions).Find(&es).Error
 }
 
 func (d *DB[T]) SelectByPage(c *gin.Context, where func(db *gorm.DB) *gorm.DB) {
